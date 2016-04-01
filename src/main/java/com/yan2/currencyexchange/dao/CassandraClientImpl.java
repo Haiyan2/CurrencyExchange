@@ -53,7 +53,7 @@ public class CassandraClientImpl implements CassandraClient {
         }
     }
 
-    public synchronized void startConnect() {
+    private synchronized void startConnect() {
 
         if (connected) {
             LOGGER.info("Already connected to Cassandra.");

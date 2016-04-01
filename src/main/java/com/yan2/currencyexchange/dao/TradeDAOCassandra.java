@@ -15,9 +15,8 @@ import org.springframework.stereotype.Service;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
-import com.datastax.driver.core.querybuilder.Insert;
+import com.datastax.driver.core.Statement;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
-import com.datastax.driver.core.querybuilder.Select.Where;
 import com.yan2.currencyexchange.model.Trade;
 
 @Service
@@ -51,7 +50,7 @@ public class TradeDAOCassandra implements TradeDAO {
     @Override
     public boolean saveTrade(Trade trade) {
 
-        Insert query = QueryBuilder.insertInto(DATABASE, TABLE_TRADE).value(ID, trade.getId())
+        Statement query = QueryBuilder.insertInto(DATABASE, TABLE_TRADE).value(ID, trade.getId())
                 .value(USERID, trade.getUserId()).value(CURRENCY_FROM, trade.getCurrencyFrom())
                 .value(CURRENCY_TO, trade.getCurrencyTo()).value(AMOUNT_SELL, trade.getAmountSell())
                 .value(AMOUNT_BUY, trade.getAmountBuy()).value(RATE, trade.getRate())
@@ -67,7 +66,7 @@ public class TradeDAOCassandra implements TradeDAO {
     @Override
     public List<Trade> getListTrades(Date date) {
 
-        Where query = QueryBuilder.select().all().from(DATABASE, TABLE_TRADE).allowFiltering()
+        Statement query = QueryBuilder.select().all().from(DATABASE, TABLE_TRADE).allowFiltering()
                 .where(gt(TIME_PLACED, date));
 
         ResultSet resultSet = cassandraClient.executeQuery(query);
