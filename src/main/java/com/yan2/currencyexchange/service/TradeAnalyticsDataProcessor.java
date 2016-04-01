@@ -13,6 +13,7 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.yan2.currencyexchange.model.TradeSummary;
@@ -30,12 +31,22 @@ public class TradeAnalyticsDataProcessor {
     @Inject
     TradeAnalyticsService tradeAnalyticsService;
 
+    @Value("${trade.summary.hours}")
+    private int nbHours;
+
+    @Value("${trade.summary.initialdelay}")
+    private int initialDelay;
+    
+    @Value("${trade.summary.refreshinterval}")
+    private int refreshInterval;
+    
+
     @PostConstruct
     public void init() {
 
         // Use scheduled service to update constantly the data.Wait 5 seconds
         // after completion before running again.
-        scheduledExecutorService.scheduleWithFixedDelay(new ProcessCommand(), 5, 5, TimeUnit.SECONDS);
+        scheduledExecutorService.scheduleWithFixedDelay(new ProcessCommand(), initialDelay, refreshInterval, TimeUnit.SECONDS);
     }
 
     @PreDestroy
@@ -44,9 +55,10 @@ public class TradeAnalyticsDataProcessor {
     }
 
     /**
-     * Add a listener to the listeners list. 
+     * Add a listener to the listeners list.
      * 
-     * @param listener A listener to add.
+     * @param listener
+     *            A listener to add.
      */
     public void addListener(TradeAnalyticsDataListener listener) {
         listeners.add(listener);
@@ -64,8 +76,7 @@ public class TradeAnalyticsDataProcessor {
     class ProcessCommand implements Runnable {
 
         /**
-         * Generate CSV for chart and notify the listeners:
-         * <code>
+         * Generate CSV for chart and notify the listeners: <code>
          * from,to,count
          * "AED","AUD",0
          * "EUR","SGD",1000
@@ -79,7 +90,7 @@ public class TradeAnalyticsDataProcessor {
 
             LOGGER.info("Starting to get new data.");
 
-            List<TradeSummary> tradeSummaryList = tradeAnalyticsService.getTradeSummary24h();
+            List<TradeSummary> tradeSummaryList = tradeAnalyticsService.getTradeSummaryByHours(nbHours);
 
             String data = tradeSummaryList.stream()
                     .collect(Collector.of(() -> new StringBuilder("from,to,count\n"), (sb, tradeSummary) -> {

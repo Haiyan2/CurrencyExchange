@@ -14,6 +14,7 @@ import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,13 +25,20 @@ public class TradeAPISimulator {
     private static String[] CURRENCIES = { "AED", "AUD", "CAD", "CHF", "CZK", "DKK", "EUR", "GBP", "HKD", "HUF", "NOK",
             "NZD", "PLN", "SEK", "SGD", "USD", "ZAR" };
 
+    @Value("${trade.simulator.enabled}")
+    boolean simulatorEnabled;
+
     @PostConstruct
     public void init() {
 
-        LOGGER.warn("Simulator is enabled!");
-        ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(10);
+        if (simulatorEnabled) {
+            LOGGER.warn("Simulator is enabled!");
+            ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(10);
 
-        scheduledExecutorService.scheduleWithFixedDelay(new PostTradeCommand(), 30000, 10, TimeUnit.MILLISECONDS);
+            scheduledExecutorService.scheduleWithFixedDelay(new PostTradeCommand(), 30000, 10, TimeUnit.MILLISECONDS);
+        } else {
+            LOGGER.debug("Simulator is disabled.");
+        }
     }
 
     class PostTradeCommand implements Runnable {
@@ -67,7 +75,7 @@ public class TradeAPISimulator {
                 String msg = "{\"userId\": \"134256\", \"currencyFrom\": \"" + from + "\", \"currencyTo\": \"" + to
                         + "\", \"amountSell\": 3000, \"amountBuy\": 707.10, \"rate\": 0.7471, \"timePlaced\" : \""
                         + dateFormat.format(new Date()) + "\", \"originatingCountry\" : \"FR\"}";
-                
+
                 LOGGER.info("POSTing simulated message: {}", msg);
 
                 os.write(msg.getBytes("UTF-8"));

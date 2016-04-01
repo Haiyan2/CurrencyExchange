@@ -5,6 +5,7 @@ import javax.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.datastax.driver.core.Cluster;
@@ -35,11 +36,16 @@ public class CassandraClientImpl implements CassandraClient {
 
     private Cluster cluster;
     private Session session;
-    private String node = "192.168.99.100";
+
     private boolean connected = false;
+
+    @Value("${cassandra.node}")
+    String node;
 
     @PostConstruct
     public synchronized void init() {
+
+        LOGGER.info("Connecting Cassandra to node {}.", node);
         startConnect();
     }
 

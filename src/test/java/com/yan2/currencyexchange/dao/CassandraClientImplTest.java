@@ -9,16 +9,23 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import org.junit.After;
-import org.junit.Before;
+import javax.inject.Inject;
+
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.datastax.driver.core.Row;
-import com.datastax.driver.core.Session;
 import com.datastax.driver.core.Statement;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
+import com.yan2.currencyexchange.CurrencyExchangeApplication;
 import com.yan2.currencyexchange.model.Trade;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(classes = CurrencyExchangeApplication.class)
+@TestPropertySource(locations = "classpath:test.properties")
 public class CassandraClientImplTest {
 
     private static final String DATABASE = "currencyexchange";
@@ -34,37 +41,15 @@ public class CassandraClientImplTest {
     private static final String TIME_PLACED = "timeplaced";
     private static final String ORINGINATING_COUNTRY = "originatingcountry";
 
+    @Inject
     private CassandraClientImpl cassandraClientImpl;
-    private Session session;
-
-    @Before
-    public void setUp() throws Exception {
-        cassandraClientImpl = new CassandraClientImpl();
-        cassandraClientImpl.init();
-        session = cassandraClientImpl.getInstance();
-    }
-
-    @After
-    public void close() {
-        cassandraClientImpl.close();
-    }
-
-    @Test
-    public void testInit() {
-        // Tested in setUp() if successful.
-    }
-
-    @Test
-    public void testGetInstance() {
-        // Tested in setUp() if successful.
-    }
 
     @Test
     public void testExecuteQuery() {
- 
+
         Trade testTrade1 = new Trade();
         Trade testTrade2 = new Trade();
-        
+
         testTrade1.setUserId("1");
         testTrade1.setCurrencyFrom("EUR");
         testTrade1.setCurrencyTo("USD");
@@ -72,7 +57,7 @@ public class CassandraClientImplTest {
         testTrade1.setAmountBuy(new BigDecimal(570.57));
         testTrade1.setRate(new BigDecimal(1.14));
         testTrade1.setOriginatingCountry("FR");
-        
+
         testTrade2.setUserId("2");
         testTrade2.setCurrencyFrom("USD");
         testTrade2.setCurrencyTo("SGD");
@@ -81,13 +66,13 @@ public class CassandraClientImplTest {
         testTrade2.setRate(new BigDecimal(1.35));
         testTrade2.setOriginatingCountry("IE");
 
-        Trade[] testTrades = new Trade[] {testTrade1, testTrade2};
-        
+        Trade[] testTrades = new Trade[] { testTrade1, testTrade2 };
+
         for (int i = 0; i < testTrades.length; i++) {
             testTrades[i].setId(UUID.randomUUID());
             testTrades[i].setTimePlaced(new Date());
         }
-        
+
         // 1. Insert test Trade data
         for (int i = 0; i < testTrades.length; i++) {
             System.out.println("***********************" + testTrades[i]);
@@ -98,17 +83,17 @@ public class CassandraClientImplTest {
                     .value(TIME_PLACED, testTrades[i].getTimePlaced())
                     .value(ORINGINATING_COUNTRY, testTrades[i].getOriginatingCountry());
 
-            session.execute(query);
+            cassandraClientImpl.getInstance().execute(query);
         }
 
         // 2. Retrieve test Trade data and verify the results
         List<Row> resultList = new ArrayList<>();
         for (int i = 0; i < testTrades.length; i++) {
-            Statement query = QueryBuilder.select().all().from(DATABASE, TABLE_TRADE).where(eq(ID, testTrades[i].getId()))
-                    .limit(1);
-            resultList.add(session.execute(query).one());
+            Statement query = QueryBuilder.select().all().from(DATABASE, TABLE_TRADE)
+                    .where(eq(ID, testTrades[i].getId())).limit(1);
+            resultList.add(cassandraClientImpl.getInstance().execute(query).one());
         }
-        
+
         assertEquals(2, resultList.size());
         for (int i = 0; i < resultList.size(); i++) {
             assertEquals(resultList.get(i).getString(USERID), testTrades[i].getUserId());
@@ -123,15 +108,16 @@ public class CassandraClientImplTest {
 
         // 3. Clean up the test Trade data and verify the results
         for (int i = 0; i < testTrades.length; i++) {
-            Statement query = QueryBuilder.delete().all().from(DATABASE, TABLE_TRADE).where(eq(ID, testTrades[i].getId()));
-            session.execute(query);
-        }       
-        for (int i = 0; i < testTrades.length; i++) {
-            Statement  query = QueryBuilder.select().all().from(DATABASE, TABLE_TRADE).where(eq(ID, testTrades[i].getId()))
-                    .limit(1);
-            assertEquals(0, session.execute(query).all().size());
+            Statement query = QueryBuilder.delete().all().from(DATABASE, TABLE_TRADE)
+                    .where(eq(ID, testTrades[i].getId()));
+            cassandraClientImpl.getInstance().execute(query);
         }
-        
+        for (int i = 0; i < testTrades.length; i++) {
+            Statement query = QueryBuilder.select().all().from(DATABASE, TABLE_TRADE)
+                    .where(eq(ID, testTrades[i].getId())).limit(1);
+            assertEquals(0, cassandraClientImpl.getInstance().execute(query).all().size());
+        }
+
     }
 
 }

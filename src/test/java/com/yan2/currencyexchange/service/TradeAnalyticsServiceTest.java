@@ -64,7 +64,7 @@ public class TradeAnalyticsServiceTest {
         // Setup the trades returned by the mocked TradeService.
         when(tradeService.getListTrades(any())).thenReturn(testTrades);
 
-        List<TradeSummary> tradeSummaryList = tradeAnalyticsService.getTradeSummary24h();
+        List<TradeSummary> tradeSummaryList = tradeAnalyticsService.getTradeSummaryByHours(24);
 
         assertEquals(4, tradeSummaryList.size());
 

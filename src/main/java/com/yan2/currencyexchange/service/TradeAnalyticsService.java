@@ -10,6 +10,8 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.yan2.currencyexchange.model.Trade;
@@ -18,13 +20,17 @@ import com.yan2.currencyexchange.model.TradeSummary;
 @Service
 public class TradeAnalyticsService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TradeAnalyticsService.class);
+
     @Inject
     TradeService tradeService;
 
-    public List<TradeSummary> getTradeSummary24h() {
+    public List<TradeSummary> getTradeSummaryByHours(int nbHours) {
+
+        LOGGER.info("Getting the trade surmmary within {} hours", nbHours);
 
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.HOUR_OF_DAY, -24);
+        calendar.add(Calendar.HOUR_OF_DAY, -nbHours);
 
         List<Trade> tradeList = tradeService.getListTrades(calendar.getTime());
 
@@ -39,8 +45,9 @@ public class TradeAnalyticsService {
             } else {
                 tradeSummary = new TradeSummary(trade.getCurrencyFrom(), trade.getCurrencyTo());
                 tradeSummaryByCurrencies.put(currencies, tradeSummary);
-                
-                // Create empty TradeSummary with reversed origin and destination currencies.
+
+                // Create empty TradeSummary with reversed origin and
+                // destination currencies.
                 StringTuple currenciesReversed = new StringTuple(trade.getCurrencyTo(), trade.getCurrencyFrom());
                 TradeSummary tradeSummaryReverse = new TradeSummary(trade.getCurrencyTo(), trade.getCurrencyFrom());
                 tradeSummaryByCurrencies.put(currenciesReversed, tradeSummaryReverse);
@@ -59,7 +66,7 @@ public class TradeAnalyticsService {
                         .compareTo(o2.getCurrencyFrom() + "-" + o2.getCurrencyTo());
             }
         });
-        
+
         return tradeSummaryList;
     }
 
