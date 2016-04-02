@@ -17,6 +17,9 @@ import com.yan2.currencyexchange.CurrencyExchangeApplication;
 import com.yan2.currencyexchange.model.Trade;
 import com.yan2.currencyexchange.service.TradeService;
 
+/**
+ * Trade API Endpoint.
+ */
 @RestController
 public class TradeAPIController {
 

@@ -11,12 +11,18 @@ import org.springframework.stereotype.Service;
 import com.yan2.currencyexchange.dao.TradeDAO;
 import com.yan2.currencyexchange.model.Trade;
 
+/**
+ * The implemetation of the TradeService class.
+ */
 @Service
 public class TradeServiceImpl implements TradeService {
 
     @Inject
     TradeDAO tradeDAO;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean saveTrade(Trade trade) {
 
@@ -28,9 +34,12 @@ public class TradeServiceImpl implements TradeService {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public List<Trade> getListTrades(Date fromTimePlaced) {
-        return tradeDAO.getListTrades(new java.sql.Date(fromTimePlaced.getTime()));
+    public List<Trade> getListTradesFromDate(Date fromTimePlaced) {
+        return tradeDAO.getListTradesFromDate(new java.sql.Date(fromTimePlaced.getTime()));
     }
 
 }

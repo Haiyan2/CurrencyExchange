@@ -19,8 +19,12 @@ import com.datastax.driver.core.Statement;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.yan2.currencyexchange.model.Trade;
 
+/**
+ * The Cassandra implementation of TradeDAO.
+ */
 @Service
 public class TradeDAOCassandra implements TradeDAO {
+
     /**
      * Logger.
      */
@@ -42,11 +46,9 @@ public class TradeDAOCassandra implements TradeDAO {
     @Inject
     CassandraClient cassandraClient;
 
-    @PostConstruct
-    public void init() {
-
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean saveTrade(Trade trade) {
 
@@ -63,8 +65,11 @@ public class TradeDAOCassandra implements TradeDAO {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public List<Trade> getListTrades(Date date) {
+    public List<Trade> getListTradesFromDate(Date date) {
 
         Statement query = QueryBuilder.select().all().from(DATABASE, TABLE_TRADE).allowFiltering()
                 .where(gt(TIME_PLACED, date));

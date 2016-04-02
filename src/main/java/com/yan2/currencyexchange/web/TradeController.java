@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.yan2.currencyexchange.service.TradeAnalyticsDataListener;
 import com.yan2.currencyexchange.service.TradeAnalyticsDataProcessor;
 
+/**
+ * 
+ */
 @Controller
 public class TradeController implements TradeAnalyticsDataListener {
 
@@ -20,6 +23,9 @@ public class TradeController implements TradeAnalyticsDataListener {
     @Inject
     TradeAnalyticsDataProcessor dataProcessor;
 
+    /**
+     * Initialize.
+     */
     @PostConstruct
     public void init() {
 
@@ -28,6 +34,9 @@ public class TradeController implements TradeAnalyticsDataListener {
 
     String data = "from,to,count";
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized void dataUpdated(String data) {
 

@@ -13,7 +13,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Trade model class.
- *
  */
 public class Trade {
 

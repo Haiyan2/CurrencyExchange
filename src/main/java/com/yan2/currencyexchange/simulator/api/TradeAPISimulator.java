@@ -17,6 +17,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+/**
+ * The simulator for trade rest API.
+ */
 @Service
 public class TradeAPISimulator {
 
@@ -28,6 +31,9 @@ public class TradeAPISimulator {
     @Value("${trade.simulator.enabled}")
     boolean simulatorEnabled;
 
+    /**
+     * Initialize.
+     */
     @PostConstruct
     public void init() {
 
@@ -46,7 +52,7 @@ public class TradeAPISimulator {
         @Override
         public void run() {
 
-            LOGGER.info("POSTing from Simulator.");
+            LOGGER.debug("POSTing from Simulator.");
 
             DateFormat dateFormat = new SimpleDateFormat("dd-MMM-yy HH:mm:ss");
 

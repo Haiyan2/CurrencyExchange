@@ -2,6 +2,9 @@ package com.yan2.currencyexchange.model;
 
 import java.math.BigDecimal;
 
+/**
+ * TradeSummary model class.
+ */
 public class TradeSummary {
 
     private String currencyFrom;

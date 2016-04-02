@@ -25,14 +25,22 @@ public class TradeAnalyticsService {
     @Inject
     TradeService tradeService;
 
-    public List<TradeSummary> getTradeSummaryByHours(int nbHours) {
+    /**
+     * Retrieve the trade summary data for analytics.
+     * 
+     * @param nbHours
+     *            The retrieval of the data for analytics will start from how
+     *            many hours ago till now.
+     * @return List of TradeSummary
+     */
+    public List<TradeSummary> getTradeSummaryFromHours(int nbHours) {
 
         LOGGER.info("Getting the trade surmmary within {} hours", nbHours);
 
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.HOUR_OF_DAY, -nbHours);
 
-        List<Trade> tradeList = tradeService.getListTrades(calendar.getTime());
+        List<Trade> tradeList = tradeService.getListTradesFromDate(calendar.getTime());
 
         Map<StringTuple, TradeSummary> tradeSummaryByCurrencies = new HashMap<>();
 

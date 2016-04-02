@@ -19,6 +19,9 @@ import org.springframework.stereotype.Service;
 import com.yan2.currencyexchange.model.TradeSummary;
 import com.yan2.currencyexchange.web.TradeController;
 
+/**
+ * The trade analytics data processor.
+ */
 @Service
 public class TradeAnalyticsDataProcessor {
 
@@ -36,19 +39,26 @@ public class TradeAnalyticsDataProcessor {
 
     @Value("${trade.summary.initialdelay}")
     private int initialDelay;
-    
+
     @Value("${trade.summary.refreshinterval}")
     private int refreshInterval;
-    
 
+    /**
+     * Initialize the bean.
+     */
     @PostConstruct
     public void init() {
 
-        // Use scheduled service to update constantly the data.Wait 5 seconds
+        // Use scheduled service to constantly update the data. Wait with a
+        // refresh interval (seconds)
         // after completion before running again.
-        scheduledExecutorService.scheduleWithFixedDelay(new ProcessCommand(), initialDelay, refreshInterval, TimeUnit.SECONDS);
+        scheduledExecutorService.scheduleWithFixedDelay(new ProcessCommand(), initialDelay, refreshInterval,
+                TimeUnit.SECONDS);
     }
 
+    /**
+     * Destroy the bean.
+     */
     @PreDestroy
     public void stop() {
         scheduledExecutorService.shutdown();
@@ -90,7 +100,7 @@ public class TradeAnalyticsDataProcessor {
 
             LOGGER.info("Starting to get new data.");
 
-            List<TradeSummary> tradeSummaryList = tradeAnalyticsService.getTradeSummaryByHours(nbHours);
+            List<TradeSummary> tradeSummaryList = tradeAnalyticsService.getTradeSummaryFromHours(nbHours);
 
             String data = tradeSummaryList.stream()
                     .collect(Collector.of(() -> new StringBuilder("from,to,count\n"), (sb, tradeSummary) -> {

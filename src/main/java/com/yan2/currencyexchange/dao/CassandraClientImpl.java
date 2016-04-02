@@ -17,6 +17,9 @@ import com.datastax.driver.core.Statement;
 import com.datastax.driver.core.exceptions.InvalidQueryException;
 import com.datastax.driver.core.exceptions.NoHostAvailableException;
 
+/**
+ * The implementation for CassandraClient.
+ */
 @Service
 public class CassandraClientImpl implements CassandraClient {
     private static final Logger LOGGER = LoggerFactory.getLogger(CassandraClientImpl.class);
@@ -42,6 +45,9 @@ public class CassandraClientImpl implements CassandraClient {
     @Value("${cassandra.node}")
     String node;
 
+    /**
+     * Initialize the connection to Cassandra database.
+     */
     @PostConstruct
     public synchronized void init() {
 
@@ -49,6 +55,9 @@ public class CassandraClientImpl implements CassandraClient {
         startConnect();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized Session getInstance() {
 
@@ -111,6 +120,9 @@ public class CassandraClientImpl implements CassandraClient {
 
     }
 
+    /**
+     * {@inheritDoc} 
+     */
     @Override
     public ResultSet executeQuery(Statement query) {
         return session.execute(query);
