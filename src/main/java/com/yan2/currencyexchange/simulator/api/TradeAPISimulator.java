@@ -31,6 +31,9 @@ public class TradeAPISimulator {
     @Value("${trade.simulator.enabled}")
     boolean simulatorEnabled;
 
+    @Value("${trade.simulator.delay}")
+    long simulatorDelay;
+    
     /**
      * Initialize.
      */
@@ -41,7 +44,7 @@ public class TradeAPISimulator {
             LOGGER.warn("Simulator is enabled!");
             ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(10);
 
-            scheduledExecutorService.scheduleWithFixedDelay(new PostTradeCommand(), 30000, 10, TimeUnit.MILLISECONDS);
+            scheduledExecutorService.scheduleWithFixedDelay(new PostTradeCommand(), 30, simulatorDelay, TimeUnit.SECONDS);
         } else {
             LOGGER.debug("Simulator is disabled.");
         }
