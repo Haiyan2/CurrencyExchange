@@ -1,4 +1,4 @@
-Currency Exchange 
+# Currency Exchange 
 =================
 
 #System Overview
@@ -38,10 +38,14 @@ Test:
 
 A machine with public IP has been setup and is running the system.
 For visualization:
-  ```http://185.87.184.99```
+```
+http://185.87.184.99
+```
 
 API Endpoint:
-  ```http://185.87.184.99/api/trades```
+```
+http://185.87.184.99/api/trades
+```
 # Endpoints
 
 ##Endpoint Assumptions
@@ -49,26 +53,30 @@ API Endpoint:
 2. All the fields are mandatory and can't be empty. For flexibility in this exercise, no validation on the length of the fields is done (e.g. no validation that the currencies are in a list of supported currencies).
 
 ##Endpoint Usage
-Once the System is running (version online or version deployed using the instruction in section “Build and Run the System within Docker”, you can access it:
-
-1. Use your application or a test tool like Postman or SoapUI to post trades through rest endpoint: 
-  ```http://[SERVER_IP]/api/trades```
-Note that the end point accepts the JSON form, e.g.,:
-  ```
-  {"userId": "134256", "currencyFrom": "EUR", "currencyTo": "GBP", "amountSell": 1000, "amountBuy": 747.10, "rate": 0.7471, "timePlaced" : "24-JAN-15 10:27:44", "originatingCountry" : "FR"}
-  ```
-
+Once the System is running (version online or version deployed using the instruction in section “Build and Run the System within Docker”, you can access it use your application or a test tool like Postman or SoapUI to post trades through rest endpoint: 
+```
+http://[SERVER_IP]/api/trades
+```
+Note that the end point accepts the JSON form, e.g.,
+```
+{"userId": "134256", "currencyFrom": "EUR", "currencyTo": "GBP", "amountSell": 1000, "amountBuy": 747.10, "rate": 0.7471, "timePlaced" : "24-JAN-15 10:27:44", "originatingCountry" : "FR"}
+```
 The end point returns only an HTTP status code. Main status codes:
   * 201 if the trade is correctly received.
   * 400 if the format of the request is not correct.
   * 500 if there is an internal error (e.g. The Database is not available).
 The posted request shall contain the Header Content-Type with value application/json.
 
-2. Open a browser, go to below link to view the analytics result:
-  ```http://[SERVER_IP]```
 
-3. (Optional) The analytics data is available from below link:
-  ```http://[SERVER_IP]/exchangeDyn.csv```
+Open a browser, go to below link to view the analytics result:
+```
+http://[SERVER_IP]
+```
+
+Optionally, you can view the analytics data from below link:
+```
+http://[SERVER_IP]/exchangeDyn.csv
+```
 
 
 #System Main Components
@@ -123,35 +131,35 @@ Prerequisite: Docker 1.10.3 or greater (see https://docs.docker.com/engine/insta
 ##Create custom Docker network:
 This network is required to ensure the containers visible to each other.
 
-  ```
-  docker network create yan2_nw
-  ```
+```
+docker network create yan2_nw
+```
 
 ##Run Cassandra container
 To run Cassandra, we use the official Docker image (see https://hub.docker.com/_/cassandra/).
 
-  ```
-  docker run --name cassandra --net=yan2_nw -p 7000:7000 -p 9160:9160 -p 9042:9042 -p 7199:7199 -d cassandra:latest
-  ```
+```
+docker run --name cassandra --net=yan2_nw -p 7000:7000 -p 9160:9160 -p 9042:9042 -p 7199:7199 -d cassandra:latest
+```
 
 ##Build Currency Exchange image
 An automated build of the Docker image has been setup using DockerHub (see https://hub.docker.com/r/haiyan/currencyexchange/) and is triggered each time there is a push to the GitHub repository. Thus it is not required to build it manually. The latest image is publicly available with the tag ```haiyan/currencyexchange:latest```.
 
 Even if it is done by DockerHub, if you prefer to build the Docker image by yourself, clone the github repository locally, open a command line and locate to the root of the project and execute the following command:
-  ```
-  docker build -t haiyan/currencyexchange:latest .
-  ```
+```
+docker build -t haiyan/currencyexchange:latest .
+```
 
 ##Run Currency Exchange container
 Note to replace ```[CASSANDRA_IP]``` with the IP of the Cassandra container.
 Run (by default the simulator is disabled) either:
-  ```
-  docker run --name currencyexchange --net=yan2_nw -e "PARAMS=--cassandra.node=[CASSANDRA_IP]" -p 80:8080 -d haiyan/currencyexchange:latest
-  ```
+```
+docker run --name currencyexchange --net=yan2_nw -e "PARAMS=--cassandra.node=[CASSANDRA_IP]" -p 80:8080 -d haiyan/currencyexchange:latest
+```
 Or if you would like to run the application with the simulator enabled, run:
-  ```
-  docker run --name currencyexchange --net=yan2_nw -e "PARAMS=--cassandra.node=[CASSANDRA_IP] --trade.simulator.enabled=true" -p 80:8080 -d haiyan/currencyexchange:latest
-  ```
+```
+docker run --name currencyexchange --net=yan2_nw -e "PARAMS=--cassandra.node=[CASSANDRA_IP] --trade.simulator.enabled=true" -p 80:8080 -d haiyan/currencyexchange:latest
+```
 
 
 #Build and Run the System - Option 2: without Docker
@@ -164,21 +172,22 @@ Note, the port to use is 8080.
 Maven 3.3 and Java 8 must be installed.
 
 Run:
-  ```
-  mvn install
-  ```
+```
+mvn install
+```
 
 ## Steps to Run the Application
 
 1. The properties file ```\config\application.properties```, contains the default configuration. The properties can be overridden using the command line.
 
 2. Go to the ```\target```, from the command line, run (by default the simulator is disabled) either:
-  ```
-  java -jar CurrencyExchange-0.0.1-SNAPSHOT.jar --cassandra.node=[CASSANDRA_IP]
-  ```
+```
+java -jar CurrencyExchange-0.0.1-SNAPSHOT.jar --cassandra.node=[CASSANDRA_IP]
+```
 Or if you would like to run the application with the simulator enabled, run:
-  ```
-  java -jar CurrencyExchange-0.0.1-SNAPSHOT.jar --cassandra.node=[CASSANDRA_IP] --trade.simulator.enabled=true
-  ```
+```
+java -jar CurrencyExchange-0.0.1-SNAPSHOT.jar --cassandra.node=[CASSANDRA_IP] --trade.simulator.enabled=true
+```
+
 
 
