@@ -38,7 +38,7 @@ Test:
 
 A machine with public IP has been setup and is running the system.
 For visualization:
-```http://185.87.184.99/exchange.html```
+```http://185.87.184.99```
 
 API Endpoint:
 ```http://185.87.184.99/api/trades```
@@ -52,7 +52,7 @@ API Endpoint:
 Once the System is running (version online or version deployed using the instruction in section “Build and Run the System within Docker”, you can access it:
 
 1. Use your application or a test tool like Postman or SoapUI to post trades through rest endpoint: 
-```http://[SERVER_IP]:8080/api/trades```
+```http://[SERVER_IP]/api/trades```
 Note that the end point accepts the JSON form, e.g.,:
 ```{"userId": "134256", "currencyFrom": "EUR", "currencyTo": "GBP", "amountSell": 1000, "amountBuy": 747.10, "rate": 0.7471, "timePlaced" : "24-JAN-15 10:27:44", "originatingCountry" : "FR"}```
 The end point returns only an HTTP status code. Main status codes:
@@ -62,10 +62,10 @@ The end point returns only an HTTP status code. Main status codes:
 The posted request shall contain the Header Content-Type with value application/json.
 
 2. Open a browser, go to below link to view the analytics result:
-```http://[SERVER_IP]:8080/exchange.html```
+```http://[SERVER_IP]```
 
 3. (Optional) The analytics data is available from below link:
-```http://[SERVER_IP]:8080/exchangeDyn.csv```
+```http://[SERVER_IP]/exchangeDyn.csv```
 
 
 #System Main Components
@@ -115,30 +115,35 @@ Future improvements:
 
 #Build and Run the System within Docker 
 
-Requires Docker 1.10.3 or greater.
+Requires Docker 1.10.3 or greater (see https://docs.docker.com/engine/installation/).
 
 ##Create custom Docker network:
+This network is required to ensure the containers visible to each other.
 
 ```
 docker network create yan2_nw
 ```
 
 ##Run Cassandra container
+To run Cassandra, we use the official Docker image (see https://hub.docker.com/_/cassandra/).
+
 ```
 docker run --name cassandra --net=yan2_nw -p 7000:7000 -p 9160:9160 -p 9042:9042 -p 7199:7199 -d cassandra:latest
 ```
 
 ##Build Currency Exchange image
-Clone the github repository and execute the following command:
-```docker build -t haiyan2/currencyexchange:latest .```
+An automated build of the Docker image has been setup using DockerHub (see https://hub.docker.com/r/haiyan/currencyexchange/) and is triggered each time there is a push to the GitHub repository. Thus it is not required to build it manually. The latest image is publicly available with the tag ```haiyan/currencyexchange:latest```.
+
+Even if it is done by DockerHub, if you prefer to build the Docker image by yourself, clone the github repository locally, open a command line and locate to the root of the project and execute the following command:
+```docker build -t haiyan/currencyexchange:latest .```
 
 ##Run Currency Exchange container
 
 ```
-docker run --name currencyexchange --net=yan2_nw -e "PARAMS=--cassandra.node=172.18.0.2 --trade.simulator.enabled=false" -p 80:8080 -d haiyan2/currencyexchange:latest
+docker run --name currencyexchange --net=yan2_nw -e "PARAMS=--cassandra.node=172.18.0.2 --trade.simulator.enabled=false" -p 80:8080 -d haiyan/currencyexchange:latest
 ```
 
-Where ```172.18.0.2``` is the IP of the cassandra container.
+Where ```172.18.0.2``` is the IP of the Cassandra container.
 
 
 
@@ -154,7 +159,9 @@ mvn install
 
 1. The properties file ```\config\application.properties```, contains the default configuration. The properties can be overridden using the command line.
 
-2. Go to the \target, from the command line, run:
-```java -jar CurrencyExchange-0.0.1-SNAPSHOT.jar --cassandra.node=[CASSANDRA_IP] --trade.simulator.enabled=false```
+2. Go to the ```\target```, from the command line, run (by default the simulator is disabled):
+```java -jar CurrencyExchange-0.0.1-SNAPSHOT.jar --cassandra.node=[CASSANDRA_IP]```
+If you would like to run the application with the simulator enabled, run:
+```java -jar CurrencyExchange-0.0.1-SNAPSHOT.jar --cassandra.node=[CASSANDRA_IP] --trade.simulator.enabled=true```
 
 
