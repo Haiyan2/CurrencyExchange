@@ -45,9 +45,8 @@ public class TradeController implements TradeAnalyticsDataListener {
     }
 
     @RequestMapping("/")
-    @ResponseBody
     String home() {
-        return "Welcome to Trade World!";
+        return "forward:/exchange.html";
     }
 
     @RequestMapping("/exchangeDyn.csv")
