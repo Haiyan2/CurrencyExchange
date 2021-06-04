@@ -1,5 +1,5 @@
 # Currency Exchange 
-=================
+======================
 
 #System Overview
 The objective of this project is to provide an overview of the trades activities. Based on the input trade data, a chord diagram visualization is generated that shows the number of trades between currencies within the latest hours.
